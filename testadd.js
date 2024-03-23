@@ -52,7 +52,7 @@ async function run() {
 
     // Here we make a search query where the key is hardwired to 'partID' 
     // and the value is picked from the input parameter that comes in the route
-     const query = { partID: req.params.item };
+     const query = { userID: req.params.item };
      console.log("Looking for: " + query);
 
     const part = await parts.findOne(query);

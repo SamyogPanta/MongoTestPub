@@ -1,5 +1,5 @@
 const { MongoClient } = require("mongodb");
-
+const cookieParser = require('cookie-parser');
 // The uri string must be the connection string for the database (obtained on Atlas).
 const uri = "mongodb+srv://samyog101:samyog101@ckmdb.vz1vhhd.mongodb.net/?retryWrites=true&w=majority&appName=ckmdb";
 
@@ -16,11 +16,54 @@ app.use(express.urlencoded({ extended: true }));
 // routes will go here
 
 // Default route:
+// app.get('/', function(req, res) {
+//   const myquery = req.query;
+//   var outstring = 'Starting... ';
+//   res.send(outstring);
+// });
+
+app.use(cookieParser());
+
+// Default route:
 app.get('/', function(req, res) {
-  const myquery = req.query;
-  var outstring = 'Starting... ';
-  res.send(outstring);
+  let form = '<form action="/login" method="post">';
+  form += 'UserId: <input type="text" name="userId"><br>';
+  form += 'UserPass: <input type="password" name="userPass"><br>';
+  form += '<input type="submit" value="Login">';
+  form += '<input type="submit" value="Register" formaction="/register">';
+  form += '</form>';
+  res.send(form);
 });
+
+app.post('/login', async function(req, res) {
+  const client = new MongoClient(uri);
+  await client.connect();
+  const database = client.db('ckmdb');
+  const parts = database.collection('auth');
+  const query = { userID: req.body.userId, userPass: req.body.userPass };
+  const user = await parts.findOne(query);
+  if(user) {
+    res.cookie('cook1', 'xyz', {maxAge : 60000});  //Sets auth = true expiring in 20 seconds 
+    res.send('Login successful');
+  } else {
+    res.send('Login unsuccessful. <a href="/">Go back</a>');
+  }
+  await client.close();
+});
+
+app.post('/register', async function(req, res) {
+  const client = new MongoClient(uri);
+  await client.connect();
+  const database = client.db('ckmdb');
+  const parts = database.collection('auth');
+  const newUser = { userID: req.body.userId, userPass: req.body.userPass };
+  await parts.insertOne(newUser);
+  res.send('Registration successful. <a href="/">Go back</a>');
+  await client.close();
+});
+
+
+
 
 app.get('/say/:name', function(req, res) {
   res.send('Hello ' + req.params.name + '!');
@@ -52,5 +95,9 @@ async function run() {
     await client.close();
   }
 }
+
+
+
 run().catch(console.dir);
 });
+
