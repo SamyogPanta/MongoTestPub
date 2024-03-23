@@ -79,7 +79,7 @@ const client = new MongoClient(uri);
 async function run() {
   try {
     const database = client.db('ckmdb');
-    const where2look = database.collection('cmps415');
+    const where2look = database.collection('auth');
 
     // Here we will make a query object using the parameters provided with the route
     // as they key:value pairs
@@ -125,7 +125,7 @@ console.log("Adding: " + doc2insert);
 async function run() {
   try {
     const database = client.db('ckmdb');
-    const where2put = database.collection('cmps415');
+    const where2put = database.collection('auth');
 
     const doit = await where2put.insertOne(doc2insert);
     console.log(doit);
