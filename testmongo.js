@@ -32,6 +32,7 @@ app.get('/', function(req, res) {
   form += '<input type="submit" value="Login">';
   form += '<input type="submit" value="Register" formaction="/register">';
   form += '</form>';
+  form += '<a href="/report">Report Cookies</a>';
   res.send(form);
 });
 
@@ -43,10 +44,10 @@ app.post('/login', async function(req, res) {
   const query = { userID: req.body.userId, userPass: req.body.userPass };
   const user = await parts.findOne(query);
   if(user) {
-    res.cookie('cook1', 'xyz', {maxAge : 60000});  //Sets auth = true expiring in 20 seconds 
-    res.send('Login successful');
+    res.cookie('cook1', 'xyz', {maxAge : 60000});  //Sets auth = true expiring in 60 seconds 
+    res.send('Login successful. <a href="/report">Report Cookies</a>');
   } else {
-    res.send('Login unsuccessful. <a href="/">Go back</a>');
+    res.send('Login unsuccessful. <a href="/">Go back</a> <a href="/report">Report Cookies</a>');
   }
   await client.close();
 });
@@ -58,7 +59,7 @@ app.post('/register', async function(req, res) {
   const parts = database.collection('auth');
   const newUser = { userID: req.body.userId, userPass: req.body.userPass };
   await parts.insertOne(newUser);
-  res.send('Registration successful. <a href="/">Go back</a>');
+  res.send('Registration successful. <a href="/">Go back</a> <a href="/report">Report Cookies</a>');
   await client.close();
 });
 
@@ -101,3 +102,23 @@ async function run() {
 run().catch(console.dir);
 });
 
+
+// Cookie-reporting endpoint:
+app.get('/report', function (req, res) {
+  let cookiesReport = JSON.stringify(req.cookies);
+  let response = `<p>Cookies: ${cookiesReport}</p>`;
+  response += '<a href="/clearcookies">Clear Cookies</a><br>';
+  response += '<a href="/">Go Back</a>';
+  res.send(response);
+});
+
+// Cookie-clearing endpoint:
+app.get('/clearcookies', function (req, res) {
+  for (let cookie in req.cookies) {
+    res.clearCookie(cookie);
+  }
+  let response = '<p>Cookies cleared.</p>';
+  response += '<a href="/report">Report Cookies</a><br>';
+  response += '<a href="/">Go Back</a>';
+  res.send(response);
+});
