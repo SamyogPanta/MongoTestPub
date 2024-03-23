@@ -1,7 +1,7 @@
 const { MongoClient } = require("mongodb");
 
 // The uri string must be the connection string for the database (obtained on Atlas).
-const uri = "mongodb+srv://<user>:<password>@ckmdb.5oxvqja.mongodb.net/?retryWrites=true&w=majority";
+const uri = "mongodb+srv://samyog101:samyog101@ckmdb.vz1vhhd.mongodb.net/?retryWrites=true&w=majority&appName=ckmdb";
 
 // --- This is the standard stuff to get it to work on the browser
 const express = require('express');
@@ -48,7 +48,7 @@ const client = new MongoClient(uri);
 async function run() {
   try {
     const database = client.db('ckmdb');
-    const parts = database.collection('cmps415');
+    const parts = database.collection('auth');
 
     // Here we make a search query where the key is hardwired to 'partID' 
     // and the value is picked from the input parameter that comes in the route
